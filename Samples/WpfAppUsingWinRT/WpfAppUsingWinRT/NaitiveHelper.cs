@@ -43,6 +43,7 @@ namespace WpfAppUsingWinRT
             {
                 window.UpdateLog(name);
             });
+            // Release delegate.
             // デリゲートの解放
             var ds = callback.GetInvocationList();
             foreach (var d in ds)

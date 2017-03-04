@@ -8,15 +8,15 @@
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // Windows ヘッダーから使用されていない部分を除外します。
-// Windows ヘッダー ファイル:
+// Windows Header file:
 #include <windows.h>
 
 
 
 // TODO: プログラムに必要な追加ヘッダーをここで参照してください
-// Windows Runtime のコレクション用ヘッダー
+// Collection header for Windows Runtime
 #include <collection.h>
-// 非同期処理用
+// For Async
 #include <ppltasks.h>
-// IInitializeWithWindow のため
+// For IInitializeWithWindow
 #include "Shobjidl.h"
