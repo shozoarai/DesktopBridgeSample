@@ -19,6 +19,7 @@ namespace WpfAppUsingWinRT
     {
         /// <summary>
         /// WinRT オブジェクトのスレッド モデルとの親和性を設定します
+        /// Initialize Windows Runtime Object.
         /// </summary>
         /// <param name="winRT"></param>
         internal static void InitializeWithWindow(object winRT)

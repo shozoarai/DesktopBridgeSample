@@ -27,6 +27,7 @@ namespace WpfAppUsingWinRT
 
         /// <summary>
         /// マネージ コードでFilePicker を開きます
+        /// using OpenFilePicker by Managed Code.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -53,6 +54,7 @@ namespace WpfAppUsingWinRT
 
         /// <summary>
         /// DLL を使用して開きます
+        /// Using Dynamic Link Library
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
