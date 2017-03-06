@@ -1,5 +1,5 @@
 # How to create PRI resources.
-[Desktop App Converter]() v1.0.6 used PRI resources, especially -MakeAppx option. PRI(Package Resource Index) Resources is new resources file by using new resource manager in UWP Apps. Of cource, you want to use scaling assets then you must create PRI resources.
+[Desktop App Converter](https://docs.microsoft.com/en-us/windows/uwp/porting/desktop-to-uwp-run-desktop-app-converter) v1.0.6 used PRI resources, especially -MakeAppx option. PRI(Package Resource Index) Resources is new resources file by using new resource manager in UWP Apps. Of cource, you want to use scaling assets then you must create PRI resources.
 
 First, ready PriConfig.xml and layout.resfiles.
 1. Launch Desktop App Converter from start menu.
@@ -41,7 +41,7 @@ Appx package creation is completed once you see the "Succeeded" message.
 
 
 # PRI リソースの作成方法について
-[Desktop App Converter]() v1.0.6 は、PRI リソースを使用します。 -MakeAppx オプションを使用すると、作成した Appx パッケージには PRI リソースが含まれています。 PRI(Package Resource Index) リソースは、UWP アプリ環境で提供される新しいリソース マネージャが使用するものです。この理由から、スケーリング対応アセットを使用する場合は、 PRI リソースを作成しなければなりません。
+[Desktop App Converter](https://docs.microsoft.com/ja-jp/windows/uwp/porting/desktop-to-uwp-run-desktop-app-converter) v1.0.6 は、PRI リソースを使用します。 -MakeAppx オプションを使用すると、作成した Appx パッケージには PRI リソースが含まれています。 PRI(Package Resource Index) リソースは、UWP アプリ環境で提供される新しいリソース マネージャが使用するものです。この理由から、スケーリング対応アセットを使用する場合は、 PRI リソースを作成しなければなりません。
 
 最初に、PriConfig.xml と layout.resfiles の準備をします。
 1. スタート メニューより Desktop App Converter を起動します。
