@@ -34,7 +34,7 @@ Finally, create appx package using makeappx utility.
 Current folder is "C:\DACWORK".  
 ````
 SET PATH="C:\Program Files (x86)\Windows Kits\10\bin\x86";%PATH%  
-makesppx pack /d .\AppxLayout /l /p myApp.appx
+makeappx.exe pack /d .\AppxLayout /l /p myApp.appx
 ````
 Appx package creation is completed once you see the "Succeeded" message.
 
@@ -76,6 +76,6 @@ makepri ユーティリティを使って、PRI リソースを作成します�
 カレント フォルダは、 "C:\DACWORK" を想定しています。  
 ````
 SET PATH="C:\Program Files (x86)\Windows Kits\10\bin\x86";%PATH%  
-makesppx pack /d .\AppxLayout /l /p myApp.appx
+makeappx.exe pack /d .\AppxLayout /l /p myApp.appx
 ````
 正常に終了すると、 "Succeeded" が表示されます。
