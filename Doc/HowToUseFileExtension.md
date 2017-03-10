@@ -92,6 +92,10 @@ When use Executable attribute, must use EntryPoint attribute. EntryPoint attribu
 
 Of course, Executable Attribute can use "Windows.Protocol" too.
 
+If you want to show "Type of file" on file property page, please set uap:DisplayName element to FileTypeAssociation child element.
+- uap:DisplayName : "Type of File" on file property page.
+- uap:InfoTip : show tooltip on Windows Explorer.
+
 If can't work of multiple file extension setting, please try follow methodologies.
 - descending order of Extension define, for example z --> a order.  
 This is same of Visual Studio manifest designer.
@@ -191,6 +195,11 @@ Executable 属性を使用すると、EntryPoint 属性も使用しなければ�
 - Windows.FullTrustApplication。 これは、変換したアプリの場合です。
 
 Executable 属性は、"Windows.Protocol" でも同じように使用することができます。
+
+ファイルのプロパティのファイルの種類を使う場合は、 FileTypeAssociation の子要素として、uap:DiaplyName 要素を設定してください。
+- uap:DisplayName : プロパティのファイルの種類へ表示します。
+- uap:InfoTip : Windows エクスプローラでツールチップに表示します。
+
 
 複数の拡張子の関連付けを行って、動作がおかしい場合は、次に示す方法を試してみます。
 - Extension の定義を、z から a の順序にします。  
