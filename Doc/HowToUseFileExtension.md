@@ -93,6 +93,7 @@ When use Executable attribute, must use EntryPoint attribute. EntryPoint attribu
 Of course, Executable Attribute can use "Windows.Protocol" too.
 
 If you want to show "Type of file" on file property page, please set uap:DisplayName element to FileTypeAssociation child element.
+- uap:Logo : show file icon per file extension. If don't use it, use Square44x44Logo instead of it.
 - uap:DisplayName : "Type of File" on file property page.
 - uap:InfoTip : show tooltip on Windows Explorer.
 
@@ -197,6 +198,7 @@ Executable 属性を使用すると、EntryPoint 属性も使用しなければ�
 Executable 属性は、"Windows.Protocol" でも同じように使用することができます。
 
 ファイルのプロパティのファイルの種類を使う場合は、 FileTypeAssociation の子要素として、uap:DiaplyName 要素を設定してください。
+- uap:Logo : 拡張子ごとのアイコンを表示します。指定しない場合は、Square44x44Logo が使用されます。
 - uap:DisplayName : プロパティのファイルの種類へ表示します。
 - uap:InfoTip : Windows エクスプローラでツールチップに表示します。
 
