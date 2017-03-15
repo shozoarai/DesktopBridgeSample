@@ -1,0 +1,24 @@
+﻿<Window x:Class="UwpProcessHelper.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UwpProcessHelper"
+        mc:Ignorable="d"
+        FontSize="24"
+        Title="Detect UWP App Process" Height="350" Width="525">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="10,0,10,10"
+                    HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Button x:Name="btnCheck" Content="Detect Process Type" Height="50" Width="250"
+                    HorizontalAlignment="Left"
+                    Click="btnCheck_Click" />
+            <TextBox x:Name="txtMsg" Margin="0,10,10,10" Height="50" Width="300"
+                     />
+        </StackPanel>
+    </Grid>
+</Window>
