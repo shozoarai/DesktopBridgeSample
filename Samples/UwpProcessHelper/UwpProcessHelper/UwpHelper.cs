@@ -7,7 +7,7 @@ namespace UwpProcessHelper
     static class UwpHelper
     {
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        static extern int GetCurrentPackageFullName(ref int packageFullNameLength, ref StringBuilder packageFullName);
+        static extern int GetCurrentPackageFullName(ref int packageFullNameLength, [MarshalAs(UnmanagedType.LPWStr)] StringBuilder packageFullName);
 
         const int APPMODEL_ERROR_NO_PACKAGE = 15700;
         const int ERROR_INSUFFICIENT_BUFFER = 122;
@@ -25,11 +25,19 @@ namespace UwpProcessHelper
                 StringBuilder sb = new StringBuilder(1024);
                 int length = 0;
                 // Get buffer size.
-                int result = GetCurrentPackageFullName(ref length, ref sb);
+                int result = GetCurrentPackageFullName(ref length, sb);
                 if (result == APPMODEL_ERROR_NO_PACKAGE)
                 {
                     return false;
                 }
+                // If you want to get PackageFullName.
+                //if (result == ERROR_INSUFFICIENT_BUFFER)
+                //{
+                //    sb = new StringBuilder(length);
+                //    result = 0;
+                //    result = GetCurrentPackageFullName(ref length, sb);
+                //    var packageFullName = sb.ToString();
+                //}
                 return true;
             }
             catch
