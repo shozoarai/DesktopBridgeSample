@@ -13,6 +13,14 @@ namespace StoreTestHelper
         internal bool IsFull;
         internal bool IsInactive;
         internal string Price;
+        internal List<AddOnLicenseInformation> AddOns;
+    }
+
+    internal struct AddOnLicenseInformation
+    {
+        internal string Key;
+        internal string SkuStoreId;
+        internal DateTime ExpirationDate;
     }
 
     internal struct Product
@@ -46,6 +54,7 @@ namespace StoreTestHelper
             var context = StoreContext.GetDefault();
 
             var licenseResult = new LicenseInformation();
+            licenseResult.AddOns = new List<AddOnLicenseInformation>();
             // Get Price
             // 価格の取得
             var storeProductResult = await context.GetStoreProductForCurrentAppAsync();
@@ -58,6 +67,17 @@ namespace StoreTestHelper
             licenseResult.IsTrial = storeLicense.IsTrial;
             licenseResult.IsInactive = !licenseResult.IsActive;
             licenseResult.IsFull = !licenseResult.IsTrial;
+            // Get Durable Add-on information
+            // 永続アドオン情報の取得
+            var addOnList = storeLicense.AddOnLicenses;
+            foreach (var i in addOnList)
+            {
+                var addOnLicense = new AddOnLicenseInformation();
+                addOnLicense.Key = i.Key;
+                addOnLicense.SkuStoreId = i.Value.SkuStoreId;
+                addOnLicense.ExpirationDate = i.Value.ExpirationDate.DateTime;
+                licenseResult.AddOns.Add(addOnLicense);
+            }
 
             return licenseResult;
         }
