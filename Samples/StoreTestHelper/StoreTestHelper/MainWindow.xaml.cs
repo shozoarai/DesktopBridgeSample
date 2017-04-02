@@ -34,6 +34,18 @@ namespace StoreTestHelper
             Logs("Trial=" + result.IsTrial.ToString());
             Logs("Full=" + result.IsFull.ToString());
             Logs("Price=" + result.Price);
+            if (result.AddOns.Count == 0)
+            {
+                Logs("=====Durable Add-On is nothing=======");
+                return;
+            }
+            Logs("=====Get Durable Add-On Information==");
+            foreach (var item in result.AddOns)
+            {
+                Logs("Key=" + item.Key);
+                Logs("SkuStoreId=" + item.SkuStoreId);
+                Logs("ExpirationDate=" + item.ExpirationDate.ToLongDateString());
+            }
         }
 
         private async void btnPurchase_Click(object sender, RoutedEventArgs e)
