@@ -1,5 +1,5 @@
 # How to prepare what is the kind of assets.
-[タイルとアイコン アセットのガイドライン](https://docs.microsoft.com/ja-jp/windows/uwp/controls-and-patterns/tiles-and-notifications-app-assets) describe about variety assets by using Apps and to use scaling assets.
+[Tile and icon asset guidelines](https://docs.microsoft.com/en-us/windows/uwp/controls-and-patterns/tiles-and-notifications-app-assets) describe about variety assets by using Apps and to use scaling assets.
 
 First, describe about the relationship of assets and AppxManifest.xml.
 1. Logo element of Properties element's children：display icon on Windows Store.
