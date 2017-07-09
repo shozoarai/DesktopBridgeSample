@@ -42,7 +42,7 @@ namespace StoreTestHelper
             Logs("=====Get Durable Add-On Information==");
             foreach (var item in result.AddOns)
             {
-                Logs("Key=" + item.Key);
+                Logs("=====Key=" + item.Key);
                 Logs("SkuStoreId=" + item.SkuStoreId);
                 Logs("ExpirationDate=" + item.ExpirationDate.ToLongDateString());
             }
@@ -69,9 +69,10 @@ namespace StoreTestHelper
             }
             foreach (var item in result.Item2)
             {
-                Logs("StoreId=" + item.StoreId);
+                Logs("=====StoreId=" + item.StoreId);
                 Logs("Title=" + item.Title);
                 Logs("Price=" + item.Price);
+                Logs("ProductKind=" + item.ProductKind);
                 txtAddOnId.Text = item.StoreId;
             }
         }
@@ -89,6 +90,31 @@ namespace StoreTestHelper
             if (!result.Item1)
                 Logs("Error");
             Logs(result.Item2);
+        }
+
+        private async void btnBalance_Click(object sender, RoutedEventArgs e)
+        {
+            var result = await StoreHelper.GetBalance(txtAddOnId.Text);
+            Logs("=====Get Consumable Balance================");
+            if (!result.Item1)
+            {
+                Logs("Error");
+            }
+            Logs(result.Item3);
+            Logs("Remaining=" + result.Item2.ToString());
+        }
+
+        private async void btnFulfillment_Click(object sender, RoutedEventArgs e)
+        {
+            var quantity = int.Parse(txtQuantity.Text);
+            var result = await StoreHelper.FulfillmentReport(txtAddOnId.Text, quantity);
+            Logs("=====Report Fulfillment================");
+            if (!result.Item1)
+            {
+                Logs("Error");
+            }
+            Logs(result.Item2);
+
         }
 
         void Logs(string msg)
