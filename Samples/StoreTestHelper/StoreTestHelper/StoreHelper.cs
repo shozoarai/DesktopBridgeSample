@@ -28,6 +28,7 @@ namespace StoreTestHelper
         internal string StoreId;
         internal string Title;
         internal string Price;
+        internal string ProductKind;    // Add Product Kind.
     }
 
     static class StoreHelper
@@ -182,22 +183,22 @@ namespace StoreTestHelper
 
                 case StorePurchaseStatus.NotPurchased:
                     isPerchased = false;
-                    msg = "Product was not purchased, it may have been canceled.";
+                    msg = "AddOn Product was not purchased, it may have been canceled.";
                     break;
 
                 case StorePurchaseStatus.NetworkError:
                     isPerchased = false;
-                    msg = "Product was not purchased due to a network error.";
+                    msg = "AddOn Product was not purchased due to a network error.";
                     break;
 
                 case StorePurchaseStatus.ServerError:
                     isPerchased = false;
-                    msg = "Product was not purchased due to a server error.";
+                    msg = "AddOn Product was not purchased due to a server error.";
                     break;
 
                 default:
                     isPerchased = false;
-                    msg = "Product was not purchased due to an unknown error.";
+                    msg = "AddOn Product was not purchased due to an unknown error.";
                     break;
             }
 
@@ -241,12 +242,110 @@ namespace StoreTestHelper
                 {
                     StoreId = item.Value.StoreId,
                     Title = item.Value.Title,
-                    Price = item.Value.Price.FormattedPrice
+                    Price = item.Value.Price.FormattedPrice,
+                    ProductKind = item.Value.ProductKind    // Add Product Kind.
                 };
                 products.Add(product);
             }
 
             return new Tuple<bool, List<Product>, string>(true, products, "");
         }
+
+        /// <summary>
+        /// Get Consumable Balance
+        /// Consumable Balance を取得します
+        /// </summary>
+        /// <param name="itemId"></param>
+        /// <returns></returns>
+        internal static async Task<Tuple<bool, long, string>> GetBalance(string itemId)
+        {
+            var context = StoreContext.GetDefault();
+            // Get CosumableBalance
+            // ConsumableBalance を取得します。
+            var consumableResult = await context.GetConsumableBalanceRemainingAsync(itemId);
+
+            long balance = 0;
+            bool result = false;
+            string msg = "";
+            string extendedError = "";
+            if (consumableResult.ExtendedError != null)
+            {
+                extendedError = consumableResult.ExtendedError.Message;
+            }
+            // Check CosumableBalance Result
+            switch (consumableResult.Status)
+            {
+                case StoreConsumableStatus.Succeeded:
+                    msg = "Remaining balance: " + consumableResult.BalanceRemaining.ToString();
+                    balance = consumableResult.BalanceRemaining;
+                    result = true;
+                    break;
+
+                case StoreConsumableStatus.NetworkError:
+                    msg = "Could not retrieve balance due to a network error. " +
+                        "ExtendedError: " + extendedError;
+                    break;
+
+                case StoreConsumableStatus.ServerError:
+                    msg = "Could not retrieve balance due to a server error. " +
+                        "ExtendedError: " + extendedError;
+                    break;
+
+                default:
+                    msg = "Could not retrieve balance due to an unknown error. " +
+                        "ExtendedError: " + extendedError;
+                    break;
+            }
+            return new Tuple<bool, long, string>(result, balance, msg);
+        }
+
+        internal static async Task<Tuple<bool, string>> FulfillmentReport(string itemId, int quantity = 1)
+        {
+            var context = StoreContext.GetDefault();
+            // Report Fulfillment
+            // Fulfillment を報告します。
+            var trackId = new Guid();
+            var consumableResult = await context.ReportConsumableFulfillmentAsync(itemId, (uint)quantity, trackId);
+
+            bool result = false;
+            string msg = "";
+            string extendedError = "";
+            if (consumableResult.ExtendedError != null)
+            {
+                extendedError = consumableResult.ExtendedError.Message;
+            }
+            // Check CosumableBalance Result
+            switch (consumableResult.Status)
+            {
+                case StoreConsumableStatus.Succeeded:
+                    result = true;
+                    msg = "The fulfillment was successful. " +
+                        $"Remaining balance: {consumableResult.BalanceRemaining}";
+                    break;
+
+                case StoreConsumableStatus.InsufficentQuantity:
+                    msg = "The fulfillment was unsuccessful because the remaining " +
+                        $"balance is insufficient. Remaining balance: {consumableResult.BalanceRemaining}";
+                    break;
+
+                case StoreConsumableStatus.NetworkError:
+                    msg = "The fulfillment was unsuccessful due to a network error. " +
+                        "ExtendedError: " + extendedError;
+                    break;
+
+                case StoreConsumableStatus.ServerError:
+                    msg = "The fulfillment was unsuccessful due to a server error. " +
+                        "ExtendedError: " + extendedError;
+                    break;
+
+                default:
+                    msg = "The fulfillment was unsuccessful due to an unknown error. " +
+                        "ExtendedError: " + extendedError;
+                    break;
+            }
+
+            return new Tuple<bool, string>(result, msg);
+        }
+
     }
 }

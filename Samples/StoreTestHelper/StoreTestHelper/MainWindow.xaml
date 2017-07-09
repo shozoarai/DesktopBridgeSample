@@ -16,6 +16,7 @@
         <StackPanel Orientation="Horizontal" >
             <TextBlock Text="Add-on StoreId:" Margin="10,10,0,0" />
             <TextBox x:Name="txtAddOnId" Margin="10,10,0,0" Width="200" />
+            <TextBox x:Name="txtQuantity" Margin="10,10,0,0" Width="50" HorizontalContentAlignment="Right">1</TextBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="1" VerticalAlignment="Top">
             <Button x:Name="btnQueryLicense" Content=" License " Height="50" Margin="10,10,0,0" 
@@ -26,6 +27,10 @@
                     Click="btnGetAddOnList_Click" />
             <Button x:Name="btnAddOn" Content="Add-On Purch" Height="50"  Margin="10,10,0,0" 
                     Click="btnAddOn_Click"/>
+            <Button x:Name="btnBalance" Content="Balance" Height="50" Margin="10,10,0,0"
+                    Click="btnBalance_Click" />
+            <Button x:Name="btnFulfillment" Content="Fulfillment" Height="50" Margin="10,10,0,0"
+                    Click="btnFulfillment_Click"/>
         </StackPanel>
         <TextBox x:Name="txtOut" AcceptsReturn="True" Grid.Row="2" Margin="10"
                  VerticalScrollBarVisibility="Visible"
