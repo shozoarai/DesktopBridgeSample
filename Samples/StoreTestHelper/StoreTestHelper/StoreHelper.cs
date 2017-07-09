@@ -304,7 +304,7 @@ namespace StoreTestHelper
             var context = StoreContext.GetDefault();
             // Report Fulfillment
             // Fulfillment を報告します。
-            var trackId = new Guid();
+            var trackId = Guid.NewGuid();
             var consumableResult = await context.ReportConsumableFulfillmentAsync(itemId, (uint)quantity, trackId);
 
             bool result = false;
