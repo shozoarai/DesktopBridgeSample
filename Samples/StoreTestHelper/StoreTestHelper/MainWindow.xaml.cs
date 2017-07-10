@@ -117,6 +117,27 @@ namespace StoreTestHelper
 
         }
 
+        private async void btnUserCollection_Click(object sender, RoutedEventArgs e)
+        {
+            var result = await StoreHelper.GetUserAddonList();
+            Logs("=====Get User Add-On List============");
+            if (!result.Item1)
+            {
+                Logs("Error");
+                Logs(result.Item3);
+                return;
+            }
+            foreach (var item in result.Item2)
+            {
+                Logs("=====StoreId=" + item.StoreId);
+                Logs("Title=" + item.Title);
+                Logs("Price=" + item.Price);
+                Logs("ProductKind=" + item.ProductKind);
+                txtAddOnId.Text = item.StoreId;
+            }
+
+        }
+
         void Logs(string msg)
         {
             txtOut.Text += msg + "\n";

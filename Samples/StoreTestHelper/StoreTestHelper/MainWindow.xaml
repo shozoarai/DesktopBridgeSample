@@ -27,6 +27,8 @@
                     Click="btnGetAddOnList_Click" />
             <Button x:Name="btnAddOn" Content="Add-On Purch" Height="50"  Margin="10,10,0,0" 
                     Click="btnAddOn_Click"/>
+            <Button x:Name="btnUserCollection" Content="Have Add-On List" Height="50" Margin="10,10,0,0"
+                    Click="btnUserCollection_Click" />
             <Button x:Name="btnBalance" Content="Balance" Height="50" Margin="10,10,0,0"
                     Click="btnBalance_Click" />
             <Button x:Name="btnFulfillment" Content="Fulfillment" Height="50" Margin="10,10,0,0"
