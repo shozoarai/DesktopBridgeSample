@@ -347,5 +347,51 @@ namespace StoreTestHelper
             return new Tuple<bool, string>(result, msg);
         }
 
+        /// <summary>
+        /// Get add-on list for current app that current user entitled to use.
+        /// ユーザーが購入済みのアドオン リストを取得します。
+        /// </summary>
+        /// <returns></returns>
+        internal static async Task<Tuple<bool, List<Product>, string>> GetUserAddonList()
+        {
+            var context = StoreContext.GetDefault();
+            // Set filters.
+            // フィルターの設定
+            var filter = new string[] {
+                "Durable",
+                "Consumable",
+                "UnmanagedConsumable"
+            };
+            // Get Add-On products.
+            // アドオンの取得
+            var storeProductQueryResult = await context.GetUserCollectionAsync(filter);
+            if (storeProductQueryResult.ExtendedError != null)
+            {
+                return new Tuple<bool, List<Product>, string>(false, null, "Error:" + storeProductQueryResult.ExtendedError.Message);
+            }
+            // Check Add-On product count.
+            // アドオンのチェック
+            if (storeProductQueryResult.Products.Count == 0)
+            {
+                return new Tuple<bool, List<Product>, string>(false, null, "AdOns is nothing");
+            }
+            // Create Add-On collection.
+            // アドオンのコレクションの作成
+            var products = new List<Product>();
+            foreach (var item in storeProductQueryResult.Products)
+            {
+                var product = new Product()
+                {
+                    StoreId = item.Value.StoreId,
+                    Title = item.Value.Title,
+                    Price = item.Value.Price.FormattedPrice,
+                    ProductKind = item.Value.ProductKind
+                };
+                products.Add(product);
+            }
+
+            return new Tuple<bool, List<Product>, string>(true, products, "");
+        }
+
     }
 }
