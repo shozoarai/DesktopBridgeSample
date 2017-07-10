@@ -1,0 +1,10 @@
+LIBRARY
+EXPORTS
+	GetAppLicense					@1
+	GetDurableAddonLicense			@2
+	GetAddonList						@3
+	GetAddonLicense					@4
+	RequestPurchaseApp				@5
+	RequestPurchaseAddon				@6
+	GetConsumableBalanceRemaining	@7
+	ReportConsumableFulfillment		@8
