@@ -62,6 +62,13 @@ bool WINAPI GetDurableAddonLicense(void* pfnResultFileRecievedCallback)
 	return true;
 }
 
+int64_t DaysUntil(DateTime endDate)
+{
+	auto calendar = ref new Windows::Globalization::Calendar();
+	calendar->SetToNow();
+	return static_cast<int>((endDate.UniversalTime - calendar->GetDateTime().UniversalTime) / 864000000000);
+}
+
 void OnGetAddonLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperation, AsyncStatus asyncStatus)
 {
 	// Get StoreAppLicense object.
@@ -72,7 +79,6 @@ void OnGetAddonLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperati
 	if (appLicense->IsActive)
 	{
 		auto addonList = appLicense->AddOnLicenses;
-		auto iterable = addonList->First();
 
 		// Form addon to string
 		for (auto item : addonList)
@@ -81,7 +87,9 @@ void OnGetAddonLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperati
 			{
 				list += "\n";
 			}
-			list += item->Key + "\t" + item->Value->SkuStoreId;
+			list += item->Key + "\t" + 
+				    item->Value->SkuStoreId + "\t" +
+				    DaysUntil(item->Value->ExpirationDate);
 		}
 		// Write duravle add-on list.
 		WriteData(ADDON_DURABLE_LIST, list);
