@@ -14,9 +14,10 @@ using namespace Windows::Services::Store;
 ///////////////////////////////////////////////////////////////////
 //
 // 	Define License callback function type for CheckLicense.
-typedef void(WINAPI *APPLICENSERECEIVED)(bool isActive, bool isTrial, bool isInactive, bool isFull);
-APPLICENSERECEIVED appLicenseReceivedCallback;
+APPLICENSERECEIVED AppLicenseReceivedCallback;
+APPLICENSEINTERNALRECEIVED AppLicenseInternalReceivedCallback;
 
+bool GetAppLicenseInternal(void* pfnAppLicenseReceivedCallback, bool isInternal);
 void OnGetAppLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperation, AsyncStatus asyncStatus);
 
 ///////////////////////////////////////////////////////////////////
@@ -26,7 +27,23 @@ void OnGetAppLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperation
 ///////////////////////////////////////////////////////////////////
 bool WINAPI GetAppLicense(void* pfnAppLicenseReceivedCallback)
 {
-	appLicenseReceivedCallback = (APPLICENSERECEIVED)pfnAppLicenseReceivedCallback;
+
+	return GetAppLicenseInternal(pfnAppLicenseReceivedCallback, false);
+}
+
+// pfnAppLicenseReceivedCalaback
+//      isInternal = false, APPLICENSERECEIVED			: for external program, such as WPF App.
+//      isInternal = true,  APPLICENSEINTERNALRECEIVED	: for another code files, such as Listing.cpp.
+bool GetAppLicenseInternal(void* pfnAppLicenseReceivedCallback, bool isInternal)
+{
+	if (isInternal)
+	{
+		AppLicenseInternalReceivedCallback = (APPLICENSEINTERNALRECEIVED)pfnAppLicenseReceivedCallback;
+	}
+	else
+	{
+		AppLicenseReceivedCallback = (APPLICENSERECEIVED)pfnAppLicenseReceivedCallback;
+	}
 
 	StoreContext^ context = StoreContext::GetDefault();
 
@@ -56,10 +73,17 @@ void OnGetAppLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperation
 	}
 	isInactive = !isActive;
 	isFull = !isTrial;
-	if (appLicenseReceivedCallback != nullptr)
+	// for external program
+	if (AppLicenseReceivedCallback != nullptr)
 	{
-		appLicenseReceivedCallback(isActive, isTrial, isInactive, isFull);
-		appLicenseReceivedCallback = nullptr;
+		AppLicenseReceivedCallback(isActive, isTrial, isInactive, isFull);
+		AppLicenseReceivedCallback = nullptr;
+	}
+	// for another code files
+	if (AppLicenseInternalReceivedCallback)
+	{
+		AppLicenseInternalReceivedCallback(appLicense);
+		AppLicenseInternalReceivedCallback = nullptr;
 	}
 }
 

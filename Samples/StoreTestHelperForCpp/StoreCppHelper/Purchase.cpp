@@ -15,13 +15,15 @@ using namespace Windows::Services::Store;
 ///////////////////////////////////////////////////////////////////
 //
 // 	Define App Purchase callback function type for RequestPurchaseApp.
-typedef void(WINAPI *RESULTPURCHASERECEIVED)(bool result, PCWSTR msg);
-static RESULTPURCHASERECEIVED resultPurchaseReceivedCallback;
+static RESULTPURCHASERECEIVED ResultPurchaseReceivedCallback;
 StoreContext^ storeContext;
 StoreProductResult^ storeProductResult;
 
+// definition variable in StoreCppHelper.cpp
+extern bool GetAppLicenseInternal(void* pfnAppLicenseReceivedCallback, bool isInternal);
+
 void OnStoreProductResultOperation(IAsyncOperation<StoreProductResult ^> ^asyncOperation, AsyncStatus asyncStatus);
-void OnStoreAppPurchaseLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperation, AsyncStatus asyncStatus);
+void OnStoreAppPurchaseLicenseOperation(StoreAppLicense^ appLicense);
 void OnAppStorePurchaseResultOperation(IAsyncOperation<StorePurchaseResult ^> ^asyncOperation, AsyncStatus asyncStatus);
 
 ///////////////////////////////////////////////////////////////////
@@ -37,7 +39,7 @@ void OnAddonStorePurchaseResultOperation(IAsyncOperation<StorePurchaseResult ^> 
 ///////////////////////////////////////////////////////////////////
 bool WINAPI RequestPurchaseApp(HWND hWnd, void* pfnResultPurchaseReceivedCallback)
 {
-	resultPurchaseReceivedCallback = (RESULTPURCHASERECEIVED)pfnResultPurchaseReceivedCallback;
+	ResultPurchaseReceivedCallback = (RESULTPURCHASERECEIVED)pfnResultPurchaseReceivedCallback;
 
 	// Initialize of Window handle for Windows Runtime Object with UI.
 	// UI を持つ Windows Runtime オブジェクトは、ウィンドウ ハンドルで初期化します
@@ -77,32 +79,38 @@ void OnStoreProductResultOperation(IAsyncOperation<StoreProductResult ^> ^asyncO
 	if (storeProductResult->ExtendedError.Value != S_OK)
 	{
 		msg = "Error:" + storeProductResult->ExtendedError.Value.ToString();
-		resultPurchaseReceivedCallback(false, msg->Data());
-		resultPurchaseReceivedCallback = nullptr;
+		if (ResultPurchaseReceivedCallback)
+		{
+			ResultPurchaseReceivedCallback(false, msg->Data());
+			ResultPurchaseReceivedCallback = nullptr;
+		}
 		return;
 	}
 
 	// Check App license.
-	auto storeAppPurchaseLicenseOperation = storeContext->GetAppLicenseAsync();
-	storeAppPurchaseLicenseOperation->Completed =
-		ref new AsyncOperationCompletedHandler<StoreAppLicense^>(&OnStoreAppPurchaseLicenseOperation);
+	GetAppLicenseInternal(&OnStoreAppPurchaseLicenseOperation, true);
 }
 
-void OnStoreAppPurchaseLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperation, AsyncStatus asyncStatus)
+void OnStoreAppPurchaseLicenseOperation(StoreAppLicense^ appLicense)
 {
 	// Check App license.
-	auto storeAppLicense = asyncOperation->GetResults();
-	if (storeAppLicense->IsActive)
+	if (appLicense->IsActive)
 	{
 		String^ msg = "You already bought this app and have a fully-licensed version.";
-		resultPurchaseReceivedCallback(false, msg->Data());
-		return;
+		if (ResultPurchaseReceivedCallback)
+		{
+			ResultPurchaseReceivedCallback(false, msg->Data());
+			ResultPurchaseReceivedCallback = nullptr;
+		}
 	}
-
-	// Request purchase app
-	auto storePurchaseResultOperation = storeProductResult->Product->RequestPurchaseAsync();
-	storePurchaseResultOperation->Completed =
-		ref new AsyncOperationCompletedHandler<StorePurchaseResult^>(&OnAppStorePurchaseResultOperation);
+	else
+	{
+		// Request purchase app
+		auto storePurchaseResultOperation = storeProductResult->Product->RequestPurchaseAsync();
+		storePurchaseResultOperation->Completed =
+			ref new AsyncOperationCompletedHandler<StorePurchaseResult^>(&OnAppStorePurchaseResultOperation);
+	}
+	appLicense = nullptr;
 }
 
 void OnAppStorePurchaseResultOperation(IAsyncOperation<StorePurchaseResult ^> ^asyncOperation, AsyncStatus asyncStatus)
@@ -116,8 +124,11 @@ void OnAppStorePurchaseResultOperation(IAsyncOperation<StorePurchaseResult ^> ^a
 	if (storePurchaseResult->ExtendedError.Value != S_OK)
 	{
 		msg = "Error:" + storePurchaseResult->ExtendedError.Value.ToString();
-		resultPurchaseReceivedCallback(result, msg->Data());
-		resultPurchaseReceivedCallback = nullptr;
+		if (ResultPurchaseReceivedCallback)
+		{
+			ResultPurchaseReceivedCallback(result, msg->Data());
+			ResultPurchaseReceivedCallback = nullptr;
+		}
 		return;
 	}
 	switch (storePurchaseResult->Status)
@@ -151,10 +162,10 @@ void OnAppStorePurchaseResultOperation(IAsyncOperation<StorePurchaseResult ^> ^a
 
 	storeContext = nullptr;
 
-	if (resultPurchaseReceivedCallback)
+	if (ResultPurchaseReceivedCallback)
 	{
-		resultPurchaseReceivedCallback(result, msg->Data());
-		resultPurchaseReceivedCallback = nullptr;
+		ResultPurchaseReceivedCallback(result, msg->Data());
+		ResultPurchaseReceivedCallback = nullptr;
 	}
 }
 
@@ -168,7 +179,7 @@ bool WINAPI RequestPurchaseAddon(HWND hWnd, PCWSTR itemid, void* pfnResultPurcha
 {
 	String^ itemID = ref new String(itemid);
 
-	resultPurchaseReceivedCallback = (RESULTPURCHASERECEIVED)pfnResultPurchaseReceivedCallback;
+	ResultPurchaseReceivedCallback = (RESULTPURCHASERECEIVED)pfnResultPurchaseReceivedCallback;
 
 	// Initialize of Window handle for Windows Runtime Object with UI.
 	// UI を持つ Windows Runtime オブジェクトは、ウィンドウ ハンドルで初期化します
@@ -210,8 +221,11 @@ void OnAddonStorePurchaseResultOperation(IAsyncOperation<StorePurchaseResult ^> 
 	if (storePurchaseResult->ExtendedError.Value != S_OK)
 	{
 		msg = "Error:" + storePurchaseResult->ExtendedError.Value.ToString();
-		resultPurchaseReceivedCallback(result, msg->Data());
-		resultPurchaseReceivedCallback = nullptr;
+		if (ResultPurchaseReceivedCallback)
+		{
+			ResultPurchaseReceivedCallback(false, msg->Data());
+			ResultPurchaseReceivedCallback = nullptr;
+		}
 		return;
 	}
 
@@ -243,10 +257,10 @@ void OnAddonStorePurchaseResultOperation(IAsyncOperation<StorePurchaseResult ^> 
 		break;
 	}
 
-	if (resultPurchaseReceivedCallback)
+	if (ResultPurchaseReceivedCallback)
 	{
-		resultPurchaseReceivedCallback(result, msg->Data());
-		resultPurchaseReceivedCallback = nullptr;
+		ResultPurchaseReceivedCallback(result, msg->Data());
+		ResultPurchaseReceivedCallback = nullptr;
 	}
 }
 
