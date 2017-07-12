@@ -14,16 +14,14 @@ using namespace Windows::Services::Store;
 ///////////////////////////////////////////////////////////////////
 //
 //  Definition Get Cosumable Balance callback function type for GetConsumableBalanceRemaining
-typedef void(WINAPI *RESULTBALANCERECEIVED)(bool result, UINT quantity, PCWSTR msg);
-static RESULTBALANCERECEIVED resultBalanceCallback;
+static RESULTBALANCERECEIVED ResultBalanceCallback;
 void OnCosumableBalanceResultCallback(IAsyncOperation<StoreConsumableResult ^> ^asyncOperation, AsyncStatus asyncStatus);
 
 ///////////////////////////////////////////////////////////////////
 //
 //  Define ReportConsumableFulfillment callback function for ReportConsumableFulfillment
 void OnCosumableFulfillmentCallback(IAsyncOperation<StoreConsumableResult ^> ^asyncOperation, AsyncStatus asyncStatus);
-typedef void(WINAPI *RESULTPURCHASERECEIVED)(bool result, PCWSTR msg);
-static RESULTPURCHASERECEIVED resultPurchaseReceivedCallback;
+static RESULTPURCHASERECEIVED ResultPurchaseReceivedCallback;
 
 
 ///////////////////////////////////////////////////////////////////
@@ -33,7 +31,7 @@ static RESULTPURCHASERECEIVED resultPurchaseReceivedCallback;
 bool WINAPI GetConsumableBalanceRemaining(PCWSTR itemid, void* pfnResultBalanceCallback)
 {
 	String^ item = ref new String(itemid);
-	resultBalanceCallback = (RESULTBALANCERECEIVED)pfnResultBalanceCallback;
+	ResultBalanceCallback = (RESULTBALANCERECEIVED)pfnResultBalanceCallback;
 	auto storeContext = StoreContext::GetDefault();
 
 	auto storeConsumableResultOperation = storeContext->GetConsumableBalanceRemainingAsync(item);
@@ -79,10 +77,10 @@ void OnCosumableBalanceResultCallback(IAsyncOperation<StoreConsumableResult ^> ^
 		break;
 	}
 
-	if (resultBalanceCallback)
+	if (ResultBalanceCallback)
 	{
-		resultBalanceCallback(result, balance, msg->Data());
-		resultBalanceCallback = nullptr;
+		ResultBalanceCallback(result, balance, msg->Data());
+		ResultBalanceCallback = nullptr;
 	}
 }
 
@@ -95,17 +93,17 @@ void OnCosumableBalanceResultCallback(IAsyncOperation<StoreConsumableResult ^> ^
 bool WINAPI ReportConsumableFulfillment(PCWSTR itemid, UINT quantity, void* pfnPurchaseReceivedCallback)
 {
 	String^ item = ref new String(itemid);
-	resultPurchaseReceivedCallback = (RESULTPURCHASERECEIVED)pfnPurchaseReceivedCallback;
+	ResultPurchaseReceivedCallback = (RESULTPURCHASERECEIVED)pfnPurchaseReceivedCallback;
 
 	auto storeContext = StoreContext::GetDefault();
 	GUID guid;
 	if (FAILED(CoCreateGuid(&guid)))
 	{
 		String^ msg = "Failed to create a tracking GUID.";
-		if (resultPurchaseReceivedCallback)
+		if (ResultPurchaseReceivedCallback)
 		{
-			resultPurchaseReceivedCallback(false, msg->Data());
-			resultPurchaseReceivedCallback = nullptr;
+			ResultPurchaseReceivedCallback(false, msg->Data());
+			ResultPurchaseReceivedCallback = nullptr;
 		}
 		return false;
 	}
@@ -157,10 +155,10 @@ void OnCosumableFulfillmentCallback(IAsyncOperation<StoreConsumableResult ^> ^as
 			"ExtendedError: " + extendedError;
 		break;
 	}
-	if (resultPurchaseReceivedCallback)
+	if (ResultPurchaseReceivedCallback)
 	{
-		resultPurchaseReceivedCallback(result, msg->Data());
-		resultPurchaseReceivedCallback = nullptr;
+		ResultPurchaseReceivedCallback(result, msg->Data());
+		ResultPurchaseReceivedCallback = nullptr;
 	}
 
 }

@@ -18,3 +18,5 @@
 #include <collection.h>
 // For IInitializeWithWindow
 #include "Shobjidl.h"
+// For common types
+#include "commontypes.h"

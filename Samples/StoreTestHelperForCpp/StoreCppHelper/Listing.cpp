@@ -21,12 +21,14 @@ String^ ADDON_LIST = "addon-list.txt";
 //
 // 	Define Addon license callback function type for GetDurableAddonLicense.
 //  Used by GetDurableAddonList and function.
-typedef void(WINAPI *RESULTFILERECEIVED)(PCWSTR filename);
-RESULTFILERECEIVED resultFileReceivedCallback = nullptr;
-String^ fileData = "";			// FileData
-String^ outputFilename = "";		// FileName
+RESULTFILERECEIVED ResultFileReceivedCallback = nullptr;
+String^ FileData = "";			// FileData
+String^ OutputFilename = "";		// FileName
 
-void OnGetAddonLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperation, AsyncStatus asyncStatus);
+// definition variable in StoreCppHelper.cpp
+extern bool GetAppLicenseInternal(void* pfnAppLicenseReceivedCallback, bool isInternal);
+
+void OnGetAddonLicenseOperation(StoreAppLicense^ appLicense);
 void WriteData(String^ filename, String^ list);
 void OnFileCreateOperation(IAsyncOperation<StorageFile ^> ^asyncOperation, AsyncStatus asyncStatus);
 void OnWriteTextOperation(IAsyncAction^ asyncOperation, AsyncStatus asyncStatus);
@@ -49,17 +51,11 @@ void OnAddonQueryResultOperation(IAsyncOperation<StoreProductQueryResult ^> ^asy
 ///////////////////////////////////////////////////////////////////
 bool WINAPI GetDurableAddonLicense(void* pfnResultFileRecievedCallback)
 {
-	fileData = "";
-	outputFilename = "";
-	resultFileReceivedCallback = (RESULTFILERECEIVED)pfnResultFileRecievedCallback;
+	FileData = "";
+	OutputFilename = "";
+	ResultFileReceivedCallback = (RESULTFILERECEIVED)pfnResultFileRecievedCallback;
 
-	StoreContext^ context = StoreContext::GetDefault();
-
-	auto licenseOperation = context->GetAppLicenseAsync();
-	licenseOperation->Completed =
-		ref new AsyncOperationCompletedHandler<StoreAppLicense ^>(&OnGetAddonLicenseOperation);
-
-	return true;
+	return GetAppLicenseInternal(&OnGetAddonLicenseOperation, true);
 }
 
 int64_t DaysUntil(DateTime endDate)
@@ -69,10 +65,8 @@ int64_t DaysUntil(DateTime endDate)
 	return static_cast<int>((endDate.UniversalTime - calendar->GetDateTime().UniversalTime) / 864000000000);
 }
 
-void OnGetAddonLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperation, AsyncStatus asyncStatus)
+void OnGetAddonLicenseOperation(StoreAppLicense^ appLicense)
 {
-	// Get StoreAppLicense object.
-	auto appLicense = asyncOperation->GetResults();
 
 	// concat durable add-on product information
 	String^ list = "";
@@ -98,14 +92,14 @@ void OnGetAddonLicenseOperation(IAsyncOperation<StoreAppLicense ^> ^asyncOperati
 	{
 		WriteData(ADDON_DURABLE_LIST, "");
 	}
-
+	appLicense = nullptr;
 }
 
 // Write Data
 void WriteData(String^ filename, String^ list)
 {
 	// Create new file with replace or new. 
-	fileData = list;
+	FileData = list;
 	auto folder = ApplicationData::Current->LocalFolder;
 
 	auto fileCreateOperation = folder->CreateFileAsync(filename, CreationCollisionOption::ReplaceExisting);
@@ -119,8 +113,8 @@ void OnFileCreateOperation(IAsyncOperation<StorageFile ^> ^asyncOperation, Async
 	// Write date to file.
 	auto file = asyncOperation->GetResults();
 
-	outputFilename = file->Path;
-	auto writeTextOperation = FileIO::WriteTextAsync(file, fileData);
+	OutputFilename = file->Path;
+	auto writeTextOperation = FileIO::WriteTextAsync(file, FileData);
 	writeTextOperation->Completed =
 		ref new AsyncActionCompletedHandler(&OnWriteTextOperation);
 }
@@ -129,11 +123,11 @@ void OnWriteTextOperation(IAsyncAction^ asyncOperation, AsyncStatus asyncStatus)
 {
 	asyncOperation->GetResults();
 
-	if (resultFileReceivedCallback)
+	if (ResultFileReceivedCallback)
 	{
 		// callback with file name.
-		resultFileReceivedCallback(outputFilename->Data());
-		resultFileReceivedCallback = nullptr;
+		ResultFileReceivedCallback(OutputFilename->Data());
+		ResultFileReceivedCallback = nullptr;
 	}
 }
 
@@ -145,9 +139,9 @@ void OnWriteTextOperation(IAsyncAction^ asyncOperation, AsyncStatus asyncStatus)
 ///////////////////////////////////////////////////////////////////
 bool WINAPI GetAddonList(void* pfnResultFileRecievedCallback)
 {
-	fileData = "";
-	outputFilename = "";
-	resultFileReceivedCallback = (RESULTFILERECEIVED)pfnResultFileRecievedCallback;
+	FileData = "";
+	OutputFilename = "";
+	ResultFileReceivedCallback = (RESULTFILERECEIVED)pfnResultFileRecievedCallback;
 
 	StoreContext^ context = StoreContext::GetDefault();
 	// set filter
@@ -201,9 +195,9 @@ void OnStoreQueryResultOperation(IAsyncOperation<StoreProductQueryResult ^> ^asy
 ///////////////////////////////////////////////////////////////////
 bool WINAPI GetAddonLicense(void* pfnResultFileRecievedCallback)
 {
-	fileData = "";
-	outputFilename = "";
-	resultFileReceivedCallback = (RESULTFILERECEIVED)pfnResultFileRecievedCallback;
+	FileData = "";
+	OutputFilename = "";
+	ResultFileReceivedCallback = (RESULTFILERECEIVED)pfnResultFileRecievedCallback;
 
 	StoreContext^ context = StoreContext::GetDefault();
 
